@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Debian::Debhelper::Dh_Lib;
+use File::Basename;
+
+my $srcpath = "llx-resources";
+my @package_list = getpackages();
+
+sub generateFiles{
+	my ($pkg ,$packagepath) = @_;
+	opendir (PACKAGEFOLDER,$packagepath);
+	while (my $component = readdir(PACKAGEFOLDER)){
+		if ( "$component" eq "." || "$component" eq ".."){
+			next;
+		}
+		if("$component" eq "icons"){
+				opendir (CATEGORY,"$packagepath/icons/");
+				while (my $category = readdir(CATEGORY)){
+						my @icons = glob "$packagepath/icons/$category/*.svg";
+						for (0..$#icons){
+							generateIcons($pkg,$category,$icons[$_]);
+						}
+					}
+				closedir(CATEGORY);
+			}
+			
+		elsif("$component" eq "banners"){
+			my @banner = glob "$packagepath/banners/*.svg";
+			for (0..$#banner){
+				generateBanner($pkg,$banner[$_]);
+			}
+		}
+		elsif("$component" eq "desktops"){
+			my @desktop = glob "$packagepath/desktops/*.desktop";
+			doit("mkdir","-p","debian/".$pkg."/usr/share/applications");
+			for (0..$#desktop){
+				doit("cp",$desktop[$_],"debian/".$pkg."/usr/share/applications");
+			}
+		}
+		elsif("$component" eq "metainfo"){
+			my @appdata = glob "$packagepath/metainfo/*.appdata.xml";
+			doit("mkdir","-p","debian/".$pkg."/usr/share/metainfo");
+			for (0..$#appdata){
+				doit("cp",$appdata[$_],"debian/".$pkg."/usr/share/metainfo");
+			}
+		}
+		elsif("$component" eq "mime"){
+			my @appdata = glob "$packagepath/mime/*.xml";
+			doit("mkdir","-p","debian/".$pkg."/usr/share/mime/packages");
+			for (0..$#appdata){
+				doit("cp",$appdata[$_],"debian/".$pkg."/usr/share/mime/packages");
+			}
+		}
+	}
+	closedir(PACKAGEFOLDER);
+}
+
+sub generateIcons{
+	my ($pkg ,$category, $svgpath) = @_;
+	$category='apps' if ($category eq '.');
+	my $basename = basename($svgpath,".svg");
+	my @sizes = (32,48,64,128,256);
+	my $baseiconpath = "/usr/share/icons/hicolor/";
+	for(0..$#sizes){
+		doit("mkdir","-p","debian/".$pkg.$baseiconpath."/".$sizes[$_]."x".$sizes[$_]."/".$category);
+		doit("rsvg-convert","-h",$sizes[$_],"-w",$sizes[$_],"-o","debian/".$pkg.$baseiconpath."/".$sizes[$_]."x".$sizes[$_]."/".$category."/".$basename.".png",$svgpath);
+	}
+	doit("mkdir","-p","debian/".$pkg.$baseiconpath."/scalable/".$category);
+	doit("cp",$svgpath,"debian/".$pkg.$baseiconpath."/scalable/".$category);
+
+}
+
+
+sub generateBanner{
+	my ($pkg ,$svgpath) = @_;
+	my $basename = basename($svgpath,".svg");
+	my $bannerlocation = "/usr/share/banners/lliurex-neu";
+	doit("mkdir","-p","debian/".$pkg.$bannerlocation);
+	doit("rsvg-convert","-o","debian/".$pkg.$bannerlocation."/".$basename.".png",$svgpath);
+}
+
+#
+#
+#
+#
+#		Main
+#
+#
+#
+#
+#
+
+
+if ( -d $srcpath ){
+	my $error = "";
+	opendir (DIR,$srcpath);
+	while (my $packagename = readdir(DIR)){
+		if ( "$packagename" eq "." || "$packagename" eq ".."){
+			next;
+		}
+		if ($packagename ~~ @package_list){
+
+			generateFiles($packagename, $srcpath . '/'. $packagename);
+		}
+		else{
+			$error .= "llx-resources/".$packagename . " folder hasn't package on control file \n";
+		}
+	}
+	closedir(DIR);
+	if ( $error ne ""){
+		print "\n******************* LLXSRC WARNING ***************** \n\n";
+		print " - " . $error;
+		print "\n**************************************************** \n";
+	}
+}
+
+
+
