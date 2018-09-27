@@ -1,0 +1,3 @@
+install/llxsrc.pm /usr/share/perl5/Debian/Debhelper/Sequence/
+install/dh_llxsrcinstall /usr/bin/
+
