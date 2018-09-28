@@ -1,3 +1,9 @@
+llxsrchelper (0.4) bionic; urgency=medium
+
+  * Update code to Bionic
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Fri, 28 Sep 2018 09:37:38 +0200
+
 llxsrchelper (0.3.3) xenial; urgency=medium
 
   * Add mime dir
