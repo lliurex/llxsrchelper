@@ -1,3 +1,9 @@
+llxsrchelper (0.5) focal; urgency=medium
+
+  * Focal version
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Mon, 14 Sep 2020 11:33:00 +0200
+
 llxsrchelper (0.4) bionic; urgency=medium
 
   * Update code to Bionic
