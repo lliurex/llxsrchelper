@@ -1,0 +1,13 @@
+Source: llxsrchelper
+Section: admin
+Priority: optional
+Maintainer: LliureX Team <lliurex@gva.es> 
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.1.2
+
+Package: llxsrchelper
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, perl, librsvg2-bin
+Description: helper to package icons, banners and desktop
+ debhelper to package icons, banners and desktop files. Dh_desktop is obsolete
+ so this package replace this function.
